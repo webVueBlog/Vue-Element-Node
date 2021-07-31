@@ -1,6 +1,6 @@
 # Vue-Element-Node.js
 
-Vue-Element+Node.js开发企业通用管理后台系统
+`Vue-Element+Node.js`开发企业通用管理后台系统
 
 前端
 
@@ -14,17 +14,17 @@ Vue-Element+Node.js开发企业通用管理后台系统
 - 图书API：图书上传，图书解析，目录解析，图书增删改查
 - 异常：全局异常，自定义异常
 
-npm,webpack,node.js
+`npm,webpack,node.js`
 
-Vue+Element-UI+vue-element-admin
+`Vue+Element-UI+vue-element-admin`
 
-Node+Express+MySQL
+`Node+Express+MySQL`
 
 > 前端：
 
-Vue+Element-UI+vuex+vue-router
+`Vue+Element-UI+vuex+vue-router`
 
-vue-element-admin+Vue-CLI 3.0+webpack
+`vue-element-admin+Vue-CLI 3.0+webpack`
 
 > 后端
 
