@@ -427,6 +427,8 @@ watch: {
 
 > vuex实现原理
 
+> vue-router实例化时会初始化this.history，不同mode对应不同的history
+
 
 
 
