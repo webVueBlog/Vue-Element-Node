@@ -427,21 +427,160 @@ watch: {
 
 > vuex实现原理
 
+> vue-router实现原理
+
 > vue-router实例化时会初始化this.history，不同mode对应不同的history
 
+```
+vue-router还提供了两个组件：
 
+Vue.component('RouterView', View)
 
+Vue.component('RouterLink', Link)
+```
 
+vuex 相当于一个公共仓库，保存这所有组件都能共用的数据
 
+## vue-router路由守卫
 
+创建router.js:
 
+```
+import Vue from 'vue'
+import Route from 'vue-router'
+import HelloWorld from './components/HelloWorld'
 
+Vue.use(Route)
 
+const routes = [
+	{ path: '/hello-world', component: HelloWorld }
+]
+const router = new Route({
+	routes
+})
 
+export default router
+```
 
+## 全局守卫/局部守卫
 
+```
+router.beforeEach((to, from, next) => {
+	console.log('beforeEach', to, from)
+	next()
+})
 
+router.beforeResolve((to, from, next) => {
+	console.log('beforeResolve', to, from)
+	next()
+})
 
+router.afterEach((to, from) => {
+	console.log('afterEach', to, from)
+})
+```
+
+局部守卫
+
+```
+beforeRouteEnter(to, from, next) {
+	// 不能获取组件实例 this
+	console.log('beforeRouteEnter', to, from)
+	next()
+},
+
+beforeRouteUpdate(to, from, next) {
+	console.log('beforeRouteUpdate', to, from)
+	next()
+},
+
+beforeRouteLeave(to, from, next) {
+	console.log('beforeRouteLeave', to, from)
+	next()
+}
+```
+
+```
+beforeEach
+beforeRouteUpdate
+beforeResolve
+afterEach
+```
+
+```
+beforeRouteLeave
+beforeEach
+beforeRosolve
+afterEach
+beforeDestroy
+```
+
+> 错误
+
+```
+// 改变title
+beforeCreate() {
+	console.log('beforeCreate')
+	document.title = 'A' // 每个组件都加这个不太好
+}
+```
+
+```
+router.beforeEach((to, from, next) => {
+	console.log('beforeEach', to, from)
+	if (to.meta.title) {
+		document.title = to.meta.title
+	} else {
+		...
+	}
+	next()
+})
+```
+
+router.js
+
+```
+Vue.mixin({
+	beforeCreate() {
+		console.log('beforeCreate', this.$router, this.$route)
+		...
+	}
+})
+```
+
+```
+// 2
+Vue.mixin({
+	beforeCreate() {
+		console.log('beforeCreate', this.$router, this.$route)
+		// $route当前路由
+		if (this.$route.meta.title) {
+			document.title = this.$route.meta.title
+		} else {
+			document.title = 'xxx'
+		}
+		...
+	}
+})
+```
+
+> 路由API
+
+使用router.addRoutes动态添加路由
+
+```
+addRoute() {
+	this.$router.addRoutes([{
+		path: '/b', component: B, meta: { title: 'Custom Title B'},
+	}])
+}
+```
+
+可以访问B：
+
+```
+<router-link to="/b"> to b </router-link>
+```
 
 
 
