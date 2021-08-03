@@ -582,7 +582,170 @@ addRoute() {
 <router-link to="/b"> to b </router-link>
 ```
 
+> 前端框架搭建
 
+vue-element-admin源码
+
+```
+git clone https://github.com/PanJiaChen/vue-element-admin
+
+cd vue-element-admin
+
+npm i
+
+npm run dev
+```
+
+项目精简
+
+- 删除src/views下的源码，保留
+- dashboard：首页
+- error-page: 异常页面
+- login:登录
+- redirect:重定向
+- 对src/router/index进行相应修改
+- 删除src/router/modules文件夹
+- 删除src/vendor文件夹
+
+> index.js
+
+```
+export const asyncRoutes = [
+	{ path: '*', redirect: '/404', hidden: true}
+]
+
+const createRouter = () => new Router({
+	scrollBehavior: () => ({ y: 0 }),
+	routes: constantRoutes
+})
+
+const router = createRouter()
+```
+
+> vue-admin-template
+
+vue-element-admin实现了登录模块，包括token校验，网络请求等
+
+## 项目配置和源码调试方法
+
+项目配置
+通过 `src/settings.js` 进行全局配置：
+
+title：站点标题，进入某个页面后，格式为：
+页面标题 - 站点标题
+- showSettings：是否显示右侧悬浮配置按钮
+- tagsView：是否显示页面标签功能条
+- fixedHeader：是否将头部布局固定
+- sidebarLogo：菜单栏中是否显示LOGO
+- errorLog：默认显示错误日志的环境
+
+默认源码title
+
+```
+// get-page-title.js
+
+import defaultSettings from '@/settings'
+const title = defaultSettings.title || '达达前端'
+
+export default function getPageTitle(pageTitle) {
+	if (pageTitle) {
+		return `${pageTitle} - ${title}`
+	}
+	return `${title}`
+}
+```
+
+permission.js
+
+```
+import { getToken } from '@/utils/auth'
+import getPageTitle from '@/utils/get-page-title'
+
+NProgress.configure({ showSpinner: false })
+
+const whiteList = ['/login', '/auth-redirect']
+
+router.beforeEach(async(to, from, next) => {
+	NProgress.start()
+	
+	document.title = getPageTitle(to.meta.title)
+	
+	const hasToken = getToken()
+})
+```
+
+> 项目结构
+
+```
+api：接口请求
+assets：静态资源
+components：通用组件
+directive：自定义指令
+filters：自定义过滤器
+icons：图标组件
+layout：布局组件
+router：路由配置
+store：状态管理
+styles：自定义样式
+utils：通用工具方法
+auth.js：token 存取
+permission.js：权限检查
+request.js：axios 请求封装
+index.js：工具方法
+views：页面
+permission.js：登录认证和路由跳转
+settings.js：全局配置
+main.js：全局入口文件
+App.vue：全局入口组件
+```
+
+> 源码调试
+
+如果需要进行源码调试，需要修改 vue.config.js：
+```
+config
+  // https://webpack.js.org/configuration/devtool/#development
+  .when(process.env.NODE_ENV === 'development',
+    config => config.devtool('cheap-source-map')
+  )
+```
+将 cheap-source-map 改为 source-map，如果希望提升构建速度可以改为 eval
+
+通常建议开发时保持 eval 配置，以增加构建速度，当出现需要源码调试排查问题时改为 source-map
+
+## 有什么针对项目体积精简的方案？
+
+代码压缩：使用 webpack 中的 compression-webpack-plugin/UglifyJS 对代码进行压缩，
+
+移除不必要的模块：对项目中没有使用到的文件 / 模块 / 代码内容进行删除，
+选择可替代的体积较小的模块：如项目中引入了 moment.js 但是只使用了 Datetime 的格式化及各种运算，可以考虑使用体积更小的 day.js 来替代 moment.js。
+
+或者使用支持 tree-shaking 的模块（通过 export function 定义的函数即可支持 tree-shaking）
+
+按需引入模块：当你面对一个巨无霸的，捆绑式的大型模块时，可能你并不会使用到它的所有的功能，你只需要按照你的需求引入模块就可以了。
+
+## 前端代码调试的方法有哪些？
+
+分析报错信息：根据控制台的报错信息定位到代码进行代码分析
+
+onsole 大法：打印出报错前后的内容
+
+对比大法：如果有相同页面，可以和其他页面进行对比看看是否缺少插件 / 模块
+
+注释代码大法：如果不知道报错位置，可以分批注释代码，定位到报错位置的代码进行分析
+
+```
+// AppMain.vue
+<router-view :key="key" />
+
+<keep-alive :include="cachedViews">
+	<router-view :key="key" />
+</keep-alive>
+
+cachedView() {
+	return this.$store.state.tagsView.cachedViews
+}
+```
 
 
 
