@@ -2,6 +2,27 @@
 
 `Vue-Element+Node.js`开发企业通用管理后台系统
 
+```
+created() {
+	this.$on('my_events', this.handleEvent)
+	this.$on('my_events', this.handleEvents2)
+	
+	// this.$on(['my_events', 'my_events2'], this.handleEvents)
+	// console.log(this._events)
+}
+methods: {
+	handleEvents(e) {
+		
+	},
+	handleEvent2(e) {
+		
+	},
+	boost() {
+		this.$emit('my_events', 'my ssss')
+	}
+}
+```
+
 前端
 
 - 登录：登录请求；登录鉴权；路由重定向
