@@ -3,6 +3,20 @@
 `Vue-Element+Node.js`开发企业通用管理后台系统
 
 ```
+// vue.config.js
+
+proxy: {
+	[process.env.VUE_APP_BASEl_API]: {
+		target: `http://127.0.0.1:${port}/mock`,
+		changeOrigin: true,
+		pathRewrite: {
+			['^' + process.env.VUE_APP_BASE_API]: ''
+		}
+	}
+},
+```
+
+```
 // +字符串转数值 !!转布尔值
 
 const state = {
