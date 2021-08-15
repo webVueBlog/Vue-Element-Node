@@ -3,6 +3,31 @@
 `Vue-Element+Node.js`开发企业通用管理后台系统
 
 ```
+// +字符串转数值 !!转布尔值
+
+const state = {
+	sidebar: {
+		opened: Cookies.get('sidebarStatus') ? !!+Cookies.get('sidebarStatus') : true, withoutAnimation: false
+	},
+	device: 'desktop',
+	size: Cookies.get('size') || 'medium'
+}
+```
+
+```
+const TokenKey = 'Admin-Token'
+export function getToken() {
+	return Cookies.get(TokenKey)
+}
+export function setToken() {
+	return Cookies.set(TokenKey)
+}
+export function removeToken() {
+	return Cookies.remove(TokenKey)
+}
+```
+
+```
 created() {
 	this.$on('my_events', this.handleEvent)
 	this.$on('my_events', this.handleEvents2)
@@ -20,6 +45,79 @@ methods: {
 	boost() {
 		this.$emit('my_events', 'my ssss')
 	}
+}
+```
+
+```
+router.beforeEach(async(to, from, next) => {
+	NProgress.start()
+	// start progress bar
+	
+	// set page title
+	document.title = getPageTitle(to.meta.title)
+	
+	// determine whether the user has logged in
+	const hasToken = getToken()
+	
+	if (hasToken) {
+		if (to.path === '/login') {
+			// if is logged in, redirect to the home page
+			next({ path: '/' })
+			NProgress.done()
+		} else {
+			const hasRoles = store.getters.roles && store.getters.roles.length > 0
+			if (hasRoles) {
+				next()
+			} else {
+				try {
+					// get user info
+					const { roles } = await store.dispath('user/getInfo')
+					
+					const accessRoutes = await store.dispath('permission/generateRoutes',)
+					
+					router.addRoutes(accessRoutes)
+					
+					next({ ...to, replace: true })
+				} catch (error) {
+					await store.dispatch('user/resetToken')
+					Message.error(error || 'Has Error')
+					next(`/login?redirect=${to.path}`)
+					NProgress.done()
+				}
+			} 
+		}
+	} else {
+		// has no token
+		if (whiteList.indexOf(to.path) !== -1) {
+			next()
+		} else {
+			next(`/login?redirect=${to.path}`)
+			NProgress.done()
+		}
+	}
+})
+
+router.afterEach(() => {
+	// finish progress bar
+	NProgress.done()
+})
+
+permission.js
+``` 
+
+```
+{
+	path: '/',
+	component: Layout,
+	redirect: '/dashboard',
+	children: [
+		{
+			path: 'dashboard',
+			component: () => import('@/view/dashboard/index'),
+			name: 'Dashboard',
+			meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
+		}
+	]
 }
 ```
 
